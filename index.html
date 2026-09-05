@@ -4042,5 +4042,13 @@
     }
 
 </script>
+<script>
+  // Sessiz ziyaret bildirimi — sayfa yüklenince bir kere haber veriyor. Bu site GitHub Pages'te
+  // barınıyor (serverless function desteği yok), bildirim fonksiyonu ise Netlify'da — bu yüzden
+  // tam adrese çapraz-domain istek atılıyor. mode:'no-cors' cevabı okumamızı engeller ama isteğin
+  // sunucuya ulaşmasını etkilemez (basit bir POST, özel header/gövde yok — CORS preflight tetiklemiyor).
+  // Sayfa deneyimini etkilemesin diye hata olursa sessizce yutuluyor.
+  fetch('https://agah-bey-kokteyl.netlify.app/.netlify/functions/visit-notify', { method: 'POST', mode: 'no-cors' }).catch(function () {});
+</script>
 </body>
 </html>
