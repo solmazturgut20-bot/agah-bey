@@ -1,6 +1,7 @@
 // Agah Bey sitesine gelen her gerçek ziyarette (index.html'in sonundaki beacon script'i tarafından
-// çağrılıyor) tsolmaz288@gmail.com'a gerçek IP/konum bilgisiyle bir e-posta gönderir. Resend API
-// anahtarı KOD İÇİNDE DEĞİL — Netlify'ın kendi ortam değişkeni deposunda (RESEND_API_KEY).
+// çağrılıyor) gerçek IP/konum bilgisiyle bir e-posta gönderir. Ne API anahtarı (RESEND_API_KEY) ne de
+// alıcı e-posta adresi (NOTIFY_EMAIL) KOD İÇİNDE — repo public olduğu için ikisi de Netlify'ın kendi
+// ortam değişkeni deposunda tutuluyor (kod içine yazsaydık herkes görebilirdi).
 
 function isPrivateIp(ip) {
   return (
@@ -41,9 +42,18 @@ export default async (req, context) => {
   }
 
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.error("RESEND_API_KEY tanımlı değil — bildirim gönderilemedi.");
+  const notifyEmail = process.env.NOTIFY_EMAIL;
+  if (!apiKey || !notifyEmail) {
+    console.error("RESEND_API_KEY veya NOTIFY_EMAIL tanımlı değil — bildirim gönderilemedi.");
     return new Response(JSON.stringify({ ok: false, error: "not-configured" }), { status: 200, headers: { "content-type": "application/json" } });
+  }
+
+  // Repo public olduğu için bu URL kod içinde herkese görünür — rastgele bot/tarayıcı taramalarının
+  // e-posta kotasını tüketmesini zorlaştırmak için (kesin bir güvenlik sınırı değil, Origin sahtelenebilir,
+  // ama sıradan otomatik taramaları eler) sadece agahbey.com'dan gelen isteklere devam ediyoruz.
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  if (origin && !origin.includes("agahbey.com")) {
+    return new Response(JSON.stringify({ ok: false, error: "forbidden-origin" }), { status: 200, headers: { "content-type": "application/json" } });
   }
 
   const ip = context.ip || req.headers.get("x-nf-client-connection-ip") || null;
@@ -66,7 +76,7 @@ export default async (req, context) => {
       },
       body: JSON.stringify({
         from: "Agah Bey Sitesi <onboarding@resend.dev>",
-        to: ["tsolmaz288@gmail.com"],
+        to: [notifyEmail],
         subject: `Agah Bey sitesine yeni ziyaretçi — ${loc.city}`,
         text: `Yeni bir ziyaretçi agahbey.com'a geldi.\n\nŞehir: ${loc.city}\nBölge/Ülke: ${bolge}\nInternet servis sağlayıcısı: ${loc.isp || "Bilinmiyor"}\nIP: ${loc.ip}\nTarayıcı: ${userAgent}\nGeldiği yer: ${referrer}\nZaman: ${now}`,
       }),
