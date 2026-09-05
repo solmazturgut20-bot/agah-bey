@@ -1,0 +1,27 @@
+{
+  "tarih": "2026-06-18T06:25:00.793Z",
+  "tarihTR": "18.06.2026 09:25:00",
+  "bot": {
+    "calisiyor": true,
+    "tokenGecerli": true,
+    "hikayeBugunPaylasildi": false,
+    "sonHikayeIndex": 24,
+    "toplamHikaye": 25,
+    "sonPaylasma": "2026-06-17T09:36:35.431Z"
+  },
+  "site": {
+    "agahbeyDurumu": "✅"
+  },
+  "finans": {
+    "btc": 63862.88,
+    "eth": 1726.61,
+    "sol": 71.06,
+    "usdtry": 46.4387,
+    "eurtry": 53.5101,
+    "bistTop": [
+      "SISE -2.3%",
+      "EREGL -2.2%",
+      "KCHOL -2.2%"
+    ]
+  }
+}
